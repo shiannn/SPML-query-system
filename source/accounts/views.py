@@ -19,6 +19,8 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic import View, FormView
 from django.conf import settings
 
+from django.urls import reverse_lazy
+
 from .utils import (
     send_activation_email, send_reset_password_email, send_forgotten_username_email, send_activation_change_email,
 )
@@ -26,6 +28,7 @@ from .forms import (
     SignInViaUsernameForm, SignInViaEmailForm, SignInViaEmailOrUsernameForm, SignUpForm,
     RestorePasswordForm, RestorePasswordViaEmailOrUsernameForm, RemindUsernameForm,
     ResendActivationCodeForm, ResendActivationCodeViaEmailForm, ChangeProfileForm, ChangeEmailForm,
+    UploadFileForm
 )
 from .models import Activation
 
@@ -329,3 +332,27 @@ class RestorePasswordDoneView(BasePasswordResetDoneView):
 
 class LogOutView(LoginRequiredMixin, BaseLogoutView):
     template_name = 'accounts/log_out.html'
+
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+class FileFieldFormView(LoginRequiredMixin, FormView):
+    template_name = 'accounts/submit.html'
+    form_class = UploadFileForm
+    success_url = reverse_lazy('index')
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        #print(form)
+        files = request.FILES.getlist('file_upload')
+        if form.is_valid():
+            #print('abcd')
+            for file_ in files:
+                with open(file_.name, 'wb') as f:
+                    for chunk in ContentFile(file_.read()).chunks():
+                        f.write(chunk)
+                #pat = default_storage.save(file_, ContentFile(file_.read()))
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
