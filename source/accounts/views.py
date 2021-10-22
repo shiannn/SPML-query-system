@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import View, FormView
+from django.views.generic import View, FormView, TemplateView
 from django.conf import settings
 
 from django.urls import reverse_lazy
@@ -344,10 +344,14 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
     def post(self, request, *args, **kwargs):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        #print(form)
+        print('request.user.submit_times', request.user.submit_times)
+        if request.user.submit_times <= 0:
+            print('could not submit')
+            return redirect('accounts:noquota')
         files = request.FILES.getlist('file_upload')
         if form.is_valid():
-            #print('abcd')
+            request.user.submit_times -= 1
+            request.user.save()
             for file_ in files:
                 with open(file_.name, 'wb') as f:
                     for chunk in ContentFile(file_.read()).chunks():
@@ -355,4 +359,20 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
                 #pat = default_storage.save(file_, ContentFile(file_.read()))
             return self.form_valid(form)
         else:
+            print('self.form_invalid(form)')
             return self.form_invalid(form)
+    """
+    def dispatch(self, request, *args, **kwargs):
+        print(request.user)
+        print(request.user.submit_times)
+
+        return super().dispatch(request, *args, **kwargs)
+    """
+    def get(self, request, *args, **kwargs):
+        print(request.user)
+        print(request.user.submit_times)
+
+        return super().get(request, *args, **kwargs)
+
+class NoQuotaView(TemplateView):
+    template_name = 'accounts/noquota.html'

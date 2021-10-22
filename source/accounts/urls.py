@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     LogInView, ResendActivationCodeView, RemindUsernameView, SignUpView, ActivateView, LogOutView,
     ChangeEmailView, ChangeEmailActivateView, ChangeProfileView, ChangePasswordView,
-    RestorePasswordView, RestorePasswordDoneView, RestorePasswordConfirmView, FileFieldFormView
+    RestorePasswordView, RestorePasswordDoneView, RestorePasswordConfirmView, FileFieldFormView,
+    NoQuotaView
 )
 
 app_name = 'accounts'
@@ -29,4 +30,5 @@ urlpatterns = [
     path('change/email/<code>/', ChangeEmailActivateView.as_view(), name='change_email_activation'),
 
     path('submit/', FileFieldFormView.as_view(), name='submit'),
+    path('noquota/', NoQuotaView.as_view(), name='noquota'),
 ]

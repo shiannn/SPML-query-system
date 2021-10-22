@@ -3,7 +3,10 @@ from datetime import timedelta
 from django import forms
 from django.forms import ValidationError
 from django.conf import settings
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.utils import timezone
 from django.db.models import Q
@@ -257,3 +260,9 @@ class RemindUsernameForm(UserCacheMixin, forms.Form):
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     file_upload = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    """
+    def is_valid(self):
+        val = super().is_valid()
+        print(val)
+        print(self.data)
+    """
