@@ -259,7 +259,8 @@ class RemindUsernameForm(UserCacheMixin, forms.Form):
 
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
-    file_upload = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    #file_upload = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    file_upload = forms.FileField()
     """
     def is_valid(self):
         val = super().is_valid()

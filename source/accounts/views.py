@@ -335,6 +335,9 @@ class LogOutView(LoginRequiredMixin, BaseLogoutView):
 
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
+import os
+import shutil
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
@@ -342,32 +345,33 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy('index')
 
     def post(self, request, *args, **kwargs):
+        request.user.submit_times = 5
+        request.user.save()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         print('request.user.submit_times', request.user.submit_times)
         if request.user.submit_times <= 0:
             print('could not submit')
             return redirect('accounts:noquota')
-        files = request.FILES.getlist('file_upload')
+        
+        file_ = request.FILES['file_upload']
         if form.is_valid():
+            user_name = request.user.get_username()
             request.user.submit_times -= 1
             request.user.save()
-            for file_ in files:
-                with open(file_.name, 'wb') as f:
-                    for chunk in ContentFile(file_.read()).chunks():
-                        f.write(chunk)
-                #pat = default_storage.save(file_, ContentFile(file_.read()))
+            fs = FileSystemStorage()
+            user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
+            ### remove the user's dir first
+            shutil.rmtree(user_dir)
+            ### make new dir and save file inside it
+            os.makedirs(user_dir)
+            fs.save(os.path.join(user_dir, file_.name), file_)
+            
             return self.form_valid(form)
         else:
             print('self.form_invalid(form)')
             return self.form_invalid(form)
-    """
-    def dispatch(self, request, *args, **kwargs):
-        print(request.user)
-        print(request.user.submit_times)
-
-        return super().dispatch(request, *args, **kwargs)
-    """
+    
     def get(self, request, *args, **kwargs):
         print(request.user)
         print(request.user.submit_times)
