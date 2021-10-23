@@ -24,6 +24,8 @@ from django.urls import reverse_lazy
 from .utils import (
     send_activation_email, send_reset_password_email, send_forgotten_username_email, send_activation_change_email,
 )
+from .judge_utils import handle_uploaded_images
+
 from .forms import (
     SignInViaUsernameForm, SignInViaEmailForm, SignInViaEmailOrUsernameForm, SignUpForm,
     RestorePasswordForm, RestorePasswordViaEmailOrUsernameForm, RemindUsernameForm,
@@ -339,6 +341,7 @@ from django.core.files.storage import FileSystemStorage
 import os
 import shutil
 from django.core.exceptions import ValidationError
+from django.http import FileResponse, HttpResponseNotFound
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
@@ -368,17 +371,52 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             ### make new dir and save file inside it
             os.makedirs(user_dir)
             fs.save(os.path.join(user_dir, file_.name), file_)
-            
+            ### handle images
+            handle_uploaded_images(user_dir, file_.name)
             return self.form_valid(form)
         else:
             print('self.form_invalid(form)')
             return self.form_invalid(form)
     
+    def get_context_data(self, **kwargs):   
+        # called whenever the pages is rendered
+        user_name = self.request.user.get_username()
+        user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
+        if os.path.exists(os.path.join(user_dir, 'result.csv')):
+            print('result.csv exist')
+            show_link = True
+        else:
+            show_link = False
+        context = super().get_context_data(**kwargs)                     
+        context["show_link"] = show_link
+        
+        return context
+
+    def send_file(request):
+        user_name = request.user.get_username()
+        user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
+        print('downloading', os.path.join(user_dir, 'result.csv'))
+        if os.path.exists(os.path.join(user_dir, 'result.csv')):
+            file_ = open(os.path.join(user_dir, 'result.csv'), 'rb')
+            response = FileResponse(file_)
+            response['Content-Disposition'] = 'attachment; filename="result.csv"'
+            return response
+        else:
+            return HttpResponseNotFound('<h3>You haven\'t submited results</h3>')
+    """
     def get(self, request, *args, **kwargs):
         print(request.user)
         print(request.user.submit_times)
+        user_name = request.user.get_username()
+        user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
+        if os.path.exists(os.path.join(user_dir, 'result.csv')):
+            print('result.csv exist')
+            show_link = True
+        else:
+            show_link = False
 
         return super().get(request, *args, **kwargs)
+    """
 
 class NoQuotaView(TemplateView):
     template_name = 'accounts/noquota.html'

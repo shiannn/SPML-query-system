@@ -31,4 +31,5 @@ urlpatterns = [
 
     path('submit/', FileFieldFormView.as_view(), name='submit'),
     path('noquota/', NoQuotaView.as_view(), name='noquota'),
+    path('download/', FileFieldFormView.send_file, name='download'),
 ]
