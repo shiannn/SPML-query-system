@@ -338,11 +338,12 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 import os
 import shutil
+from django.core.exceptions import ValidationError
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
     form_class = UploadFileForm
-    success_url = reverse_lazy('index')
+    success_url = reverse_lazy('accounts:submit')
 
     def post(self, request, *args, **kwargs):
         request.user.submit_times = 5
@@ -354,15 +355,16 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             print('could not submit')
             return redirect('accounts:noquota')
         
-        file_ = request.FILES['file_upload']
         if form.is_valid():
+            file_ = request.FILES['file_upload']
             user_name = request.user.get_username()
             request.user.submit_times -= 1
             request.user.save()
             fs = FileSystemStorage()
             user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
             ### remove the user's dir first
-            shutil.rmtree(user_dir)
+            if os.path.exists(user_dir):
+                shutil.rmtree(user_dir)
             ### make new dir and save file inside it
             os.makedirs(user_dir)
             fs.save(os.path.join(user_dir, file_.name), file_)

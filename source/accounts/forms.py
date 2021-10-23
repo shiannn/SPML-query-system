@@ -267,3 +267,11 @@ class UploadFileForm(forms.Form):
         print(val)
         print(self.data)
     """
+    def clean_file_upload(self):
+        file_ = self.cleaned_data['file_upload']
+        if file_.size > 1500000:
+            raise ValidationError("The maximum file size that can be uploaded is 1.5MB")
+        elif file_.content_type.split('/')[1] != 'zip':
+            raise ValidationError("The file type should be .zip")
+        else:
+            return file_
