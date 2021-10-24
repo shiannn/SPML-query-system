@@ -11,12 +11,16 @@ CONTENT_DIR = os.path.join(BASE_DIR, 'content')
 AUTH_USER_MODEL = 'accounts.UserSubmitting'
 SECRET_KEY = 'NhfTvayqggTBPswCXXhWaN69HuglgZIkM'
 
-DEBUG = True
-ALLOWED_HOSTS = []
+#DEBUG = True
+DEBUG = False
+ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = []
 
 SITE_ID = 1
 
 INSTALLED_APPS = [
+    'django_crontab',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,3 +140,10 @@ STATICFILES_DIRS = [
 LOCALE_PATHS = [
     os.path.join(CONTENT_DIR, 'locale')
 ]
+
+cronlog_path = os.path.join(BASE_DIR, 'scheduled_job.log')
+CRONJOBS = [
+    ('0 0 * * *', 'accounts.cron.my_scheduled_job', '>> '+str(cronlog_path)),
+]
+CRONTAB_DJANGO_MANAGE_PATH = os.path.join(BASE_DIR, 'manage.py')
+CRONTAB_COMMAND_SUFFIX = '2>&1'

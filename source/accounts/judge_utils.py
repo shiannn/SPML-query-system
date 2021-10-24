@@ -17,7 +17,7 @@ def handle_uploaded_images(user_dir, file_name):
     std_rgb = torch.tensor([0.2023, 0.1994, 0.2010])
     acc = 0
     ### unzip
-    header = ['name', 'logit1', 'logit2', 'logit3', 'logit4', 'logit5']
+    header = ['name', 'top1 class', 'top2 class', 'top3 class', 'top4 class', 'top5 class']
     datas = []
     with zipfile.ZipFile(os.path.join(user_dir, file_name)) as myzip:
         with torch.no_grad():

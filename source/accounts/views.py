@@ -342,7 +342,6 @@ import os
 import shutil
 from django.core.exceptions import ValidationError
 from django.http import FileResponse, HttpResponseNotFound
-from .models import UserSubmitting
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
@@ -409,12 +408,6 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
     def get(self, request, *args, **kwargs):
         print(request.user)
         print(request.user.submit_times)
-        all_users = UserSubmitting.objects.all()
-        for u in all_users:
-            print('all_users', u)
-            print(u.submit_times)
-            u.submit_times = 5
-            u.save()
 
         return super().get(request, *args, **kwargs)
 
