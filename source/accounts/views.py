@@ -20,10 +20,11 @@ from django.views.generic import View, FormView, TemplateView
 from django.conf import settings
 
 from django.urls import reverse_lazy
-
+"""
 from .utils import (
     send_activation_email, send_reset_password_email, send_forgotten_username_email, send_activation_change_email,
 )
+"""
 from .judge_utils import handle_uploaded_images
 
 from .forms import (
@@ -137,7 +138,7 @@ class SignUpView(GuestOnlyView, FormView):
 
         return redirect('index')
 
-
+"""
 class ActivateView(View):
     @staticmethod
     def get(request, code):
@@ -299,7 +300,7 @@ class RemindUsernameView(GuestOnlyView, FormView):
         messages.success(self.request, _('Your username has been successfully sent to your email.'))
 
         return redirect('accounts:remind_username')
-
+"""
 
 class ChangePasswordView(BasePasswordChangeView):
     template_name = 'accounts/profile/change_password.html'
@@ -315,7 +316,7 @@ class ChangePasswordView(BasePasswordChangeView):
 
         return redirect('accounts:change_password')
 
-
+"""
 class RestorePasswordConfirmView(BasePasswordResetConfirmView):
     template_name = 'accounts/restore_password_confirm.html'
 
@@ -330,7 +331,7 @@ class RestorePasswordConfirmView(BasePasswordResetConfirmView):
 
 class RestorePasswordDoneView(BasePasswordResetDoneView):
     template_name = 'accounts/restore_password_done.html'
-
+"""
 
 class LogOutView(LoginRequiredMixin, BaseLogoutView):
     template_name = 'accounts/log_out.html'

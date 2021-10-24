@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-
+"""
 def send_mail(to, template, context):
     html_content = render_to_string('accounts/emails/{}.html'.format(template), context)
     text_content = render_to_string('accounts/emails/{}.txt'.format(template), context)
@@ -49,3 +49,4 @@ def send_forgotten_username_email(email, username):
     }
 
     send_mail(email, 'forgotten_username', context)
+"""
