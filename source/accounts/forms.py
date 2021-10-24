@@ -115,8 +115,8 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = settings.SIGN_UP_FIELDS
 
-    email = forms.EmailField(label=_('Email'), help_text=_('Required. Enter an existing email address.'))
-
+    #email = forms.EmailField(label=_('Email'), help_text=_('Required. Enter an existing email address.'))
+    """
     def clean_email(self):
         email = self.cleaned_data['email']
 
@@ -125,6 +125,7 @@ class SignUpForm(UserCreationForm):
             raise ValidationError(_('You can not use this email address.'))
 
         return email
+    """
 
 
 class ResendActivationCodeForm(UserCacheMixin, forms.Form):
@@ -271,8 +272,8 @@ class UploadFileForm(forms.Form):
     """
     def clean_file_upload(self):
         file_ = self.cleaned_data['file_upload']
-        if file_.size > 1500000:
-            raise ValidationError("The maximum file size that can be uploaded is 1.5MB")
+        if file_.size > 2000000:
+            raise ValidationError("The maximum file size that can be uploaded is 2.0MB")
         elif file_.content_type.split('/')[1] != 'zip':
             raise ValidationError("The file type should be .zip")
         else:
@@ -280,10 +281,11 @@ class UploadFileForm(forms.Form):
                 num_zip = 0
                 is_all_images = True
                 for info in myzip.infolist():
-                    if not info.is_dir():
-                        num_zip += 1
-                        if Path(info.filename).suffix not in ['.png', '.jpg']:
-                            is_all_images = False
+                    if not str(info.filename).startswith('__MACOSX/'):
+                        if not info.is_dir():
+                            num_zip += 1
+                            if Path(info.filename).suffix not in ['.png', '.jpg']:
+                                is_all_images = False
             if num_zip > 500:
                 raise ValidationError("The .zip should not contain over 500 files")
             elif not is_all_images:

@@ -10,4 +10,4 @@ class Activation(models.Model):
     email = models.EmailField(blank=True)
 
 class UserSubmitting(AbstractUser):
-    submit_times = models.IntegerField(default=5)
+    submit_times = models.IntegerField(default=10)

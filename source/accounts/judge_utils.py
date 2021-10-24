@@ -23,7 +23,8 @@ def handle_uploaded_images(user_dir, file_name):
         with torch.no_grad():
             for idx,file_ in enumerate(myzip.infolist()):
                 print(file_.filename)
-                if Path(file_.filename).suffix in ['.png', '.jpg']:
+                if not str(file_.filename).startswith('__MACOSX/')\
+                and Path(file_.filename).suffix in ['.png', '.jpg']:
                     input_name = Path(file_.filename).name
                     tgt = int(input_name.split('_')[0])
                     single_file = myzip.read(file_)
