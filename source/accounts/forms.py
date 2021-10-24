@@ -257,6 +257,8 @@ class RemindUsernameForm(UserCacheMixin, forms.Form):
 
         return email
 
+import zipfile
+from pathlib import Path
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     #file_upload = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
@@ -274,4 +276,17 @@ class UploadFileForm(forms.Form):
         elif file_.content_type.split('/')[1] != 'zip':
             raise ValidationError("The file type should be .zip")
         else:
-            return file_
+            with zipfile.ZipFile(file_) as myzip:
+                num_zip = 0
+                is_all_images = True
+                for info in myzip.infolist():
+                    if not info.is_dir():
+                        num_zip += 1
+                        if Path(info.filename).suffix not in ['.png', '.jpg']:
+                            is_all_images = False
+            if num_zip > 500:
+                raise ValidationError("The .zip should not contain over 500 files")
+            elif not is_all_images:
+                raise ValidationError("The .zip should only contain .png .jpg")
+            else:
+                return file_

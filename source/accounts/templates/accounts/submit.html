@@ -13,7 +13,11 @@
         {% bootstrap_form form %}
 
         <button type="submit" class="btn btn-success">{% trans 'Submit' %}</button>
-        
+
+        <li>
+            You still have {{ submit_times }} submissions remaining today!
+        </li>
+
         {% if show_link %}
         <li>
             <a href="{% url 'accounts:download' %}">{% trans 'Download last result.csv' %}</a>

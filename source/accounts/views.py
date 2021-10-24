@@ -342,6 +342,7 @@ import os
 import shutil
 from django.core.exceptions import ValidationError
 from django.http import FileResponse, HttpResponseNotFound
+from .models import UserSubmitting
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
@@ -349,17 +350,17 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
     success_url = reverse_lazy('accounts:submit')
 
     def post(self, request, *args, **kwargs):
-        request.user.submit_times = 5
-        request.user.save()
+        #request.user.submit_times = 5
+        #request.user.save()
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        print('request.user.submit_times', request.user.submit_times)
         if request.user.submit_times <= 0:
             print('could not submit')
             return redirect('accounts:noquota')
         
         if form.is_valid():
             file_ = request.FILES['file_upload']
+            print('request.user', request.user, file_)
             user_name = request.user.get_username()
             request.user.submit_times -= 1
             request.user.save()
@@ -389,6 +390,7 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             show_link = False
         context = super().get_context_data(**kwargs)                     
         context["show_link"] = show_link
+        context["submit_times"] = self.request.user.submit_times
         
         return context
 
@@ -403,20 +405,19 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             return response
         else:
             return HttpResponseNotFound('<h3>You haven\'t submited results</h3>')
-    """
+    
     def get(self, request, *args, **kwargs):
         print(request.user)
         print(request.user.submit_times)
-        user_name = request.user.get_username()
-        user_dir = os.path.join(settings.MEDIA_ROOT, user_name)
-        if os.path.exists(os.path.join(user_dir, 'result.csv')):
-            print('result.csv exist')
-            show_link = True
-        else:
-            show_link = False
+        all_users = UserSubmitting.objects.all()
+        for u in all_users:
+            print('all_users', u)
+            print(u.submit_times)
+            u.submit_times = 5
+            u.save()
 
         return super().get(request, *args, **kwargs)
-    """
+
 
 class NoQuotaView(TemplateView):
     template_name = 'accounts/noquota.html'
