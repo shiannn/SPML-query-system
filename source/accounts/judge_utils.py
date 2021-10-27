@@ -2,6 +2,7 @@ import os
 import csv
 import zipfile
 import numpy as np
+import pandas as pd
 import cv2
 from pathlib import Path
 import torch
@@ -20,7 +21,7 @@ idx2class = [
     'skunk', 'skyscraper', 'snail', 'snake', 'spider', 'squirrel', 'streetcar', 'sunflower', 
     'sweet_pepper', 'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout', 
     'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman', 'worm']
-def handle_uploaded_images(user_dir, file_name):
+def handle_uploaded_images(user_dir, file_name, comment='# The comments'):
     print('handle_uploaded_images')
     net = ptcv_get_model("resnet56_cifar100", pretrained=True)
     net = net.eval()
@@ -77,9 +78,16 @@ def handle_uploaded_images(user_dir, file_name):
         print('acc', acc)
     #print(datas)
     with open(os.path.join(user_dir, 'result.csv'), 'w') as f:
+        f.write('# Title: '+comment+'\n')
+    df = pd.DataFrame(datas, columns=header)
+    df = df.sort_values(by=['name'])
+    df.to_csv(os.path.join(user_dir, 'result.csv'), index=False, mode='a')
+    """
+    with open(os.path.join(user_dir, 'result.csv'), 'w') as f:
         writer = csv.writer(f)
         # write the header
         writer.writerow(header)
         # write the data
         for data in datas:
             writer.writerow(data)
+    """

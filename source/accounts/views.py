@@ -362,6 +362,7 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
         
         if form.is_valid():
             file_ = request.FILES['file_upload']
+            title =  request.POST.get('title')
             print('request.user', request.user, file_)
             user_name = request.user.get_username()
             request.user.submit_times -= 1
@@ -375,7 +376,7 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             os.makedirs(user_dir)
             fs.save(os.path.join(user_dir, file_.name), file_)
             ### handle images
-            handle_uploaded_images(user_dir, file_.name)
+            handle_uploaded_images(user_dir, file_.name, comment=title)
             ### save submission time with json file
             loc_dt = datetime.datetime.today() 
             time_del = datetime.timedelta(hours=8)
