@@ -8,6 +8,18 @@ import torch
 from pytorchcv.model_provider import get_model as ptcv_get_model
 #from django.conf import settings
 
+idx2class = [
+    'apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 'bicycle', 'bottle', 
+    'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 
+    'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 
+    'dinosaur', 'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 
+    'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion', 'lizard', 'lobster', 'man', 
+    'maple_tree', 'motorcycle', 'mountain', 'mouse', 'mushroom', 'oak_tree', 'orange', 'orchid', 
+    'otter', 'palm_tree', 'pear', 'pickup_truck', 'pine_tree', 'plain', 'plate', 'poppy', 'porcupine', 
+    'possum', 'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 'shark', 'shrew', 
+    'skunk', 'skyscraper', 'snail', 'snake', 'spider', 'squirrel', 'streetcar', 'sunflower', 
+    'sweet_pepper', 'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout', 
+    'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman', 'worm']
 def handle_uploaded_images(user_dir, file_name):
     print('handle_uploaded_images')
     net = ptcv_get_model("resnet56_cifar100", pretrained=True)
@@ -17,7 +29,13 @@ def handle_uploaded_images(user_dir, file_name):
     std_rgb = torch.tensor([0.2023, 0.1994, 0.2010])
     acc = 0
     ### unzip
-    header = ['name', 'top1 class', 'top2 class', 'top3 class', 'top4 class', 'top5 class']
+    header = [
+        'name', 'top1 class', 'top1 logit',
+        'top2 class', 'top2 logit', 
+        'top3 class', 'top3 logit',
+        'top4 class', 'top4 logit', 
+        'top5 class', 'top5 logit'
+    ]
     datas = []
     COUNT_ACC = False
     with zipfile.ZipFile(os.path.join(user_dir, file_name)) as myzip:
@@ -50,7 +68,10 @@ def handle_uploaded_images(user_dir, file_name):
                     if COUNT_ACC:
                         acc += (top5idx[0,0].item()==tgt)
                     data = [input_name]
-                    data.extend(top5idx[0].tolist())
+                    for logit, class_idx in zip(top5val[0].tolist(), top5idx[0].tolist()):
+                        #data.extend(top5idx[0].tolist())
+                        data.append(str(class_idx)+'-'+idx2class[class_idx])
+                        data.append(logit)
                     datas.append(data)
     if COUNT_ACC:
         print('acc', acc)
