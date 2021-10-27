@@ -29,7 +29,7 @@
 
         {% if show_link %}
         <li>
-            <a href="{% url 'accounts:download' %}">{% trans 'Download last result.csv' %}</a>
+            <a href="{% url 'accounts:download' %}">Download result.csv submitted successful at {{ submission_time }}</a>
         </li>
         {% endif %}
     </form>

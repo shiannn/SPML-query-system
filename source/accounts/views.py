@@ -343,6 +343,8 @@ import os
 import shutil
 from django.core.exceptions import ValidationError
 from django.http import FileResponse, HttpResponseNotFound
+import json
+import datetime
 
 class FileFieldFormView(LoginRequiredMixin, FormView):
     template_name = 'accounts/submit.html'
@@ -374,6 +376,15 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             fs.save(os.path.join(user_dir, file_.name), file_)
             ### handle images
             handle_uploaded_images(user_dir, file_.name)
+            ### save submission time with json file
+            loc_dt = datetime.datetime.today() 
+            time_del = datetime.timedelta(hours=8)
+            new_dt = loc_dt + time_del
+            submission = {
+                "submission_time": new_dt.strftime("%Y/%m/%d %H:%M:%S")
+            }
+            with open(os.path.join(user_dir, "submission.json"), 'w') as f:
+                json.dump(submission, f)
             return self.form_valid(form)
         else:
             print('self.form_invalid(form)')
@@ -388,9 +399,16 @@ class FileFieldFormView(LoginRequiredMixin, FormView):
             show_link = True
         else:
             show_link = False
+        if os.path.exists(os.path.join(user_dir, 'submission.json')):
+            with open(os.path.join(user_dir, "submission.json"), 'r') as f:
+                submission_dict = json.load(f)
+            submit_datetime = submission_dict["submission_time"]
+        else:
+            submit_datetime = None
         context = super().get_context_data(**kwargs)                     
         context["show_link"] = show_link
         context["submit_times"] = self.request.user.submit_times
+        context["submission_time"] = submit_datetime
         
         return context
 
