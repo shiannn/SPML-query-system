@@ -143,7 +143,7 @@ LOCALE_PATHS = [
 
 cronlog_path = os.path.join(BASE_DIR, 'scheduled_job.log')
 CRONJOBS = [
-    ('0 0 * * *', 'accounts.cron.my_scheduled_job', '>> '+str(cronlog_path)),
+    ('5 0 * * *', 'accounts.cron.my_scheduled_job', '>> '+str(cronlog_path)),
 ]
 CRONTAB_DJANGO_MANAGE_PATH = os.path.join(BASE_DIR, 'manage.py')
 CRONTAB_COMMAND_SUFFIX = '2>&1'

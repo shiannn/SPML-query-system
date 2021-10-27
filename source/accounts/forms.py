@@ -260,6 +260,7 @@ class RemindUsernameForm(UserCacheMixin, forms.Form):
 
 import zipfile
 from pathlib import Path
+
 class UploadFileForm(forms.Form):
     title = forms.CharField(max_length=50)
     #file_upload = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
@@ -272,23 +273,32 @@ class UploadFileForm(forms.Form):
     """
     def clean_file_upload(self):
         file_ = self.cleaned_data['file_upload']
+        print(file_.name, file_.content_type)
         if file_.size > 2000000:
             raise ValidationError("The maximum file size that can be uploaded is 2.0MB")
-        elif file_.content_type.split('/')[1] != 'zip':
+        elif not zipfile.is_zipfile(file_):
             raise ValidationError("The file type should be .zip")
         else:
             with zipfile.ZipFile(file_) as myzip:
                 num_zip = 0
                 is_all_images = True
+                is_all_ascii = True
                 for info in myzip.infolist():
                     if not str(info.filename).startswith('__MACOSX/'):
                         if not info.is_dir():
                             num_zip += 1
                             if Path(info.filename).suffix not in ['.png', '.jpg']:
                                 is_all_images = False
+                            if not is_ascii(str(info.filename)):
+                                is_all_ascii = False
             if num_zip > 500:
                 raise ValidationError("The .zip should not contain over 500 files")
             elif not is_all_images:
                 raise ValidationError("The .zip should only contain .png .jpg")
+            elif not is_all_ascii:
+                raise ValidationError("The .zip should only contain ascii filename")
             else:
                 return file_
+
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
