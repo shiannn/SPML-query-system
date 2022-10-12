@@ -1,8 +1,21 @@
 # Machine Learning Query System via Django
-- This is an image classification system for HW1 of Security and Privacy of Machine Learning.
+- This is an image classification system for HW1 of **Security and Privacy of Machine Learning**.
 - Five adversarially trained models are provided for evaluating images uploaded by users.
     - Students need to generate adversarial examples (images) with enough attacking strength to make pre-trained models mis-classify.
-- An csv file of the results on each submitted image will be provided after each submission.
+    - Each submission is in **.zip** format containing no more than **500** images.
+    - Each student has only 10 submissions per day.
+- An csv file of the classification results on each submitted image will be provided after each submission.
+
+    <img src="./screenshots/submit.png">
+
+# Users account settings
+| Log In | Create an account | Authorized page |
+| -------|--------------|-----------------|
+| <img src="./screenshots/login.png" width="200"> | <img src="./screenshots/create_an_account.png" width="200"> | <img src="./screenshots/authorized_page.png" width="200"> |
+
+| Password reset | Set new password | Password change |
+| ---------------|------------------|-----------------|
+| <img src="./screenshots/password_reset.png" width="200"> | <img src="./screenshots/set_new_password.png" width="200"> | <img src="./screenshots/password_change.png" width="200"> |
 
 # Installing
 ### Clone the repository
@@ -19,7 +32,7 @@
 ```=bash
     python -m pip install -r requirements.txt
 ```
-### Apply
+### Apply migrations
 ```=bash
     python source/manage.py migrate
 ```
