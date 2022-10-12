@@ -46,6 +46,5 @@
 ```
 
 # Acknowledgement
-The codebase of the repo is highly borrowed from Yehor Smoliakov
-- https://github.com/egorsmkv
+The codebase of the **registration** and **login** is highly borrowed from [Yehor Smoliakov](https://github.com/egorsmkv)
 - https://github.com/egorsmkv/simple-django-login-and-register
